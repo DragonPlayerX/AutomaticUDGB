@@ -120,13 +120,13 @@ namespace AutomaticUDGB
                         }
                     }
                 }
-
-                while (Console.KeyAvailable)
-                    Console.ReadKey(true);
-
-                ColorConsole.Msg("\n\nPress any key to exit.");
-                Console.ReadKey();
             }
+
+            while (Console.KeyAvailable)
+                Console.ReadKey(true);
+
+            ColorConsole.Msg("\n\nPress any key to exit.");
+            Console.ReadKey();
         }
 
         private static void ProcessOutputStream(object obj, DataReceivedEventArgs e)
