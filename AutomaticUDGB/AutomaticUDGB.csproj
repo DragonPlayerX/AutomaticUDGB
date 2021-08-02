@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<LangVersion>Latest</LangVersion>
+		<TargetFramework>net4.7.2</TargetFramework>
+		<ProjectGuid>{5DCDBB5C-EA43-4165-8690-A25B2F67AADE}</ProjectGuid>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>AutomaticUDGB</RootNamespace>
+		<AssemblyName>AutomaticUDGB</AssemblyName>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources/UDGB.zip" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+</Project>
