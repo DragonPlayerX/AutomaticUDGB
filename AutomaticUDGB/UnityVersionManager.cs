@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System;
 
 namespace AutomaticUDGB
 {
@@ -13,16 +12,13 @@ namespace AutomaticUDGB
 
         public override List<string> FetchVersions()
         {
-            string tempFile = Path.GetTempFileName();
-
-            ColorConsole.Msg("Downloading Unity Versions to " + tempFile);
+            ColorConsole.Msg("[Unity] Downloading list of versions...");
 
             webClient.Headers.Add("User-Agent", "Unity Web Player");
-            webClient.DownloadFile(url, tempFile);
+            string[] entries = webClient.DownloadString(url).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
             List<string> result = new List<string>();
-
-            foreach (string line in File.ReadAllLines(tempFile, Encoding.UTF8))
+            foreach (string line in entries)
             {
                 string[] contents = line.ToLower().Replace("\"", "").Split(',');
                 if (contents[1].Equals("add") && contents[2].Equals("file") && contents[5].Equals("unity"))
@@ -40,13 +36,7 @@ namespace AutomaticUDGB
                 }
             }
 
-            ColorConsole.Msg("Finished downloading Unity Versions.");
-
-            if (File.Exists(tempFile))
-            {
-                File.Delete(tempFile);
-                ColorConsole.Msg("Deleted temp file " + tempFile);
-            }
+            ColorConsole.Msg("[Unity] Found " + result.Count + " versions of Unity.");
 
             return result;
         }

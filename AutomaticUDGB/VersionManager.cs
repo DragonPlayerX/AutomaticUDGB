@@ -10,9 +10,6 @@ namespace AutomaticUDGB
 
         public abstract List<string> FetchVersions();
 
-        public VersionManager(string url)
-        {
-            this.url = url;
-        }
+        public VersionManager(string url) => this.url = url;
     }
 }

@@ -15,6 +15,6 @@ namespace AutomaticUDGB
         [JsonProperty("path")]
         public string Path;
         [JsonProperty("size")]
-        public string Size;
+        public int Size;
     }
 }

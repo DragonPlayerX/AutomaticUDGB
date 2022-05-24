@@ -4,14 +4,14 @@ namespace AutomaticUDGB
 {
     public static class ColorConsole
     {
-        public static void Msg(string message, bool noNewLine = false)
+        public static void Msg(string message, bool newLine = true)
         {
             ConsoleColor color = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.White;
-            if (noNewLine)
-                Console.Write(message);
-            else
+            if (newLine)
                 Console.WriteLine(message);
+            else
+                Console.Write(message);
             Console.ForegroundColor = color;
         }
 

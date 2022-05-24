@@ -9,22 +9,30 @@ namespace AutomaticUDGB
 {
     public static class Program
     {
+        private static readonly string AppPath = AppDomain.CurrentDomain.BaseDirectory;
+        private static readonly string UdgbPath = Path.Combine(AppPath, "UDGB");
+        private static readonly string ExePath = Path.Combine(UdgbPath, "UDGB.exe");
+        private static readonly string ZipPath = Path.Combine(AppPath, "UDGB.zip");
+        private static readonly string LogPath = Path.Combine(AppPath, "Logs");
+        private static readonly string OutputPath = Path.Combine(AppPath, "Output Dependencies");
+        private static readonly string UnityUrl = "https://symbolserver.unity3d.com/000Admin/history.txt";
+        private static readonly string GitHubUrl = "https://api.github.com/repos/LavaGang/Unity-Runtime-Libraries/git/trees/master";
+
         public static void Main(string[] args)
         {
-            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/UDGB/UDGB.exe"))
+            if (!File.Exists(ExePath))
             {
                 ColorConsole.Msg("Extracting UDGB...");
                 try
                 {
                     Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("AutomaticUDGB.Resources.UDGB.zip");
-                    FileStream file = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "/UDGB.zip", FileMode.Create, FileAccess.Write);
+                    FileStream file = new FileStream(ZipPath, FileMode.Create, FileAccess.Write);
                     resource.CopyTo(file);
                     resource.Close();
                     file.Close();
 
-                    ZipFile.ExtractToDirectory(AppDomain.CurrentDomain.BaseDirectory + "/UDGB.zip", AppDomain.CurrentDomain.BaseDirectory + "/UDGB");
-
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + "/UDGB.zip");
+                    ZipFile.ExtractToDirectory(ZipPath, UdgbPath);
+                    File.Delete(ZipPath);
 
                     ColorConsole.Msg("Successfully extracted UDGB.");
                 }
@@ -32,20 +40,19 @@ namespace AutomaticUDGB
                 {
                     ColorConsole.Error(e.Message);
                 }
+
+                ColorConsole.Msg("");
             }
 
-            ColorConsole.Msg("");
-
-            UnityVersionManager unityVersionManager = new UnityVersionManager("https://symbolserver.unity3d.com/000Admin/history.txt");
+            UnityVersionManager unityVersionManager = new UnityVersionManager(UnityUrl);
             List<string> unityVersions = unityVersionManager.FetchVersions();
 
-            GitHubVersionManager gitHubVersionManager = new GitHubVersionManager("https://api.github.com/repos/LavaGang/Unity-Runtime-Libraries/git/trees/master");
+            GitHubVersionManager gitHubVersionManager = new GitHubVersionManager(GitHubUrl);
             List<string> githubVersions = gitHubVersionManager.FetchVersions();
 
             ColorConsole.Msg("\nComparing version lists...");
 
             List<string> missingVersions = new List<string>();
-
             foreach (string unityVersion in unityVersions)
             {
                 if (!githubVersions.Contains(unityVersion))
@@ -66,7 +73,7 @@ namespace AutomaticUDGB
                     ColorConsole.Msg("Unity " + version);
                 }
 
-                ColorConsole.Msg("\nDo you want to automatically generate the zip files? (y/n): ", true);
+                ColorConsole.Msg("\nDo you want to automatically generate the zip files? (y/n): ", false);
 
                 string input = Console.ReadLine();
 
@@ -77,27 +84,44 @@ namespace AutomaticUDGB
                     {
                         ColorConsole.Msg("Generating dependencies for Unity " + version + "...\n");
                         Process process = new Process();
-                        process.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "/UDGB/UDGB.exe";
+                        process.StartInfo.FileName = ExePath;
+                        process.StartInfo.WorkingDirectory = UdgbPath;
                         process.StartInfo.Arguments = version;
                         process.StartInfo.UseShellExecute = false;
                         process.StartInfo.RedirectStandardOutput = true;
                         process.StartInfo.RedirectStandardError = true;
                         process.OutputDataReceived += ProcessOutputStream;
                         process.ErrorDataReceived += ProcessErrorStream;
+
                         process.Start();
                         process.BeginOutputReadLine();
                         process.BeginErrorReadLine();
                         process.WaitForExit();
+
+                        string logFile = Path.Combine(LogPath, version + ".log");
+
+                        if (!Directory.Exists(LogPath))
+                            Directory.CreateDirectory(LogPath);
+                        if (File.Exists(logFile))
+                            File.Delete(logFile);
+
+                        string udgbLogFile = Path.Combine(UdgbPath, "output.log");
+
+                        File.Move(udgbLogFile, logFile);
+                        File.Delete(udgbLogFile);
+
                         if (process.ExitCode == 0)
                         {
                             ColorConsole.Success("\nSuccessfully generated dependencies for Unity " + version);
-                            string outputDir = AppDomain.CurrentDomain.BaseDirectory + "/Output Dependencies";
-                            string outputFile = outputDir + "/" + version + ".zip";
-                            if (!Directory.Exists(outputDir))
-                                Directory.CreateDirectory(outputDir);
-                            if (File.Exists(outputFile))
-                                File.Delete(outputFile);
-                            File.Move(AppDomain.CurrentDomain.BaseDirectory + "/UDGB/" + version + ".zip", outputFile);
+
+                            string dependencyFile = Path.Combine(OutputPath, version + ".zip");
+
+                            if (!Directory.Exists(OutputPath))
+                                Directory.CreateDirectory(OutputPath);
+                            if (File.Exists(dependencyFile))
+                                File.Delete(dependencyFile);
+
+                            File.Move(Path.Combine(UdgbPath, version + ".zip"), dependencyFile);
                         }
                         else
                         {
@@ -114,9 +138,7 @@ namespace AutomaticUDGB
                     {
                         ColorConsole.Warning("\nNo dependencies could be generated for the following versions:");
                         foreach (string version in failed)
-                        {
                             ColorConsole.Msg("Unity " + version);
-                        }
                     }
                 }
             }
