@@ -9,9 +9,8 @@ namespace AutomaticUDGB
 {
     public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/UDGB/UDGB.exe"))
             {
                 ColorConsole.Msg("Extracting UDGB...");

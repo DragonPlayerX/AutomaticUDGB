@@ -4,7 +4,6 @@ namespace AutomaticUDGB
 {
     public static class ColorConsole
     {
-
         public static void Msg(string message, bool noNewLine = false)
         {
             ConsoleColor color = Console.ForegroundColor;

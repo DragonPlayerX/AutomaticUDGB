@@ -1,20 +1,20 @@
-﻿namespace AutomaticUDGB
+﻿using Newtonsoft.Json;
+
+namespace AutomaticUDGB
 {
     public class GithubTree
     {
-        public string sha;
-        public string url;
-        public GithubFile[] tree;
-        public bool truncated;
+        [JsonProperty("url")]
+        public string Url;
+        [JsonProperty("tree")]
+        public GithubFile[] FileTree;
     }
 
     public class GithubFile
     {
-        public string path;
-        public string mode;
-        public string blob;
-        public string sha;
-        public string size;
-        public string url;
+        [JsonProperty("path")]
+        public string Path;
+        [JsonProperty("size")]
+        public string Size;
     }
 }

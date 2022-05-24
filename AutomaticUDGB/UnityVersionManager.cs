@@ -6,7 +6,6 @@ namespace AutomaticUDGB
 {
     public class UnityVersionManager : VersionManager
     {
-
         public UnityVersionManager(string url) : base(url)
         {
 
@@ -14,7 +13,6 @@ namespace AutomaticUDGB
 
         public override List<string> FetchVersions()
         {
-
             string tempFile = Path.GetTempFileName();
 
             ColorConsole.Msg("Downloading Unity Versions to " + tempFile);
