@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System;
 
 namespace AutomaticUDGB
 {
@@ -15,24 +14,24 @@ namespace AutomaticUDGB
             ColorConsole.Msg("[Unity] Downloading list of versions...");
 
             webClient.Headers.Add("User-Agent", "Unity Web Player");
-            string[] entries = webClient.DownloadString(url).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string page = webClient.DownloadString(url);
+
+            string target = "id=\"_unityVersions\"";
+            int start = page.IndexOf(target);
+            string part = page.Substring(start + target.Length + 1);
+            int end = part.IndexOf("<");
+
+            string versions = part.Substring(0, end);
 
             List<string> result = new List<string>();
-            foreach (string line in entries)
+            foreach (string entry in versions.Split(','))
             {
-                string[] contents = line.ToLower().Replace("\"", "").Split(',');
-                if (contents[1].Equals("add") && contents[2].Equals("file") && contents[5].Equals("unity"))
+                string[] version = entry.Split('.');
+                if (version.Length == 3 && version[2].Contains("f"))
                 {
-                    if (contents[6].Contains("."))
-                    {
-                        string[] version = contents[6].Split('.');
-                        if (version.Length == 3 && version[2].Contains("f"))
-                        {
-                            string trimmedVersion = contents[6].Substring(0, contents[6].LastIndexOf("f"));
-                            if (!result.Contains(trimmedVersion))
-                                result.Add(trimmedVersion);
-                        }
-                    }
+                    string trimmedVersion = entry.Substring(0, entry.LastIndexOf("f"));
+                    if (!result.Contains(trimmedVersion))
+                        result.Add(trimmedVersion);
                 }
             }
 

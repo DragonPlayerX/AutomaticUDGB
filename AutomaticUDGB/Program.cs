@@ -15,7 +15,7 @@ namespace AutomaticUDGB
         private static readonly string ZipPath = Path.Combine(AppPath, "UDGB.zip");
         private static readonly string LogPath = Path.Combine(AppPath, "Logs");
         private static readonly string OutputPath = Path.Combine(AppPath, "Output Dependencies");
-        private static readonly string UnityUrl = "https://symbolserver.unity3d.com/000Admin/history.txt";
+        private static readonly string UnityUrl = "https://alpha.release-notes.ds.unity3d.com/";
         private static readonly string GitHubUrl = "https://api.github.com/repos/LavaGang/Unity-Runtime-Libraries/git/trees/master";
 
         public static void Main(string[] args)
